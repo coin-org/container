@@ -1,3 +1,21 @@
 FROM jenkins/jenkins:lts
 
-USER S_jenkins
+ENV JENKINS_INSTALL_DIR  /DATA/jenkins
+ENV JENKINS_HOME         /var/jenkins_home  
+ARG gid=50000
+ARG uid=50001
+ARG user=S_jenkins
+ARG group=svcusr
+
+USER root
+
+RUN mkdir -p $(dirname $JENKINS_HOME)  \
+    && groupadd -g ${gid} ${group} \ 
+    && useradd -u ${uid} -g ${gid} -m -s /bin/bash ${user}  \
+    && chown -R ${user}:${group} $JENKINS_HOME  \
+    && chmod -R 755 $JENKINS_HOME 
+
+USER ${user}:${group}     
+
+EXPOSE 9080
+WORKDIR JENKINS_INSTALL_DIR
